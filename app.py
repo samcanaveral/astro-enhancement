@@ -10,7 +10,11 @@ try:
     import time
 
     # 🔐 Replace with your Replicate API Token
-    REPLICATE_TOKEN = "r8_XTelSOe16FTpiFXMGo9fMEfp9cmjXWe2KJBt0"
+    REPLICATE_TOKEN = st.secrets["REPLICATE_TOKEN"] if "REPLICATE_TOKEN" in st.secrets else ""
+
+    if not REPLICATE_TOKEN:
+        st.error("Replicate API token not found. Please set it in Streamlit secrets.")
+        st.stop()
 
     # Upload section
     st.title("🔭 AstroVision AI")
@@ -65,6 +69,11 @@ try:
                         json=payload
                     )
 
+                    if response.status_code == 401:
+                        st.error("Unauthorized. Invalid Replicate token.")
+                        st.write("Response:", response.text)
+                        st.stop()
+
                     if response.status_code != 201:
                         st.error("Replicate call failed.")
                         st.write("Status Code:", response.status_code)
@@ -100,5 +109,6 @@ try:
 except ModuleNotFoundError as e:
     print("This script requires Streamlit. Please make sure you're running this in a Streamlit environment.")
     print("Error:", e)
+
 
 
