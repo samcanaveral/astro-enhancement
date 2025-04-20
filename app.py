@@ -3,52 +3,85 @@ import requests
 from PIL import Image
 import io
 import base64
+import time
 
-st.set_page_config(page_title="AstroVision AI", layout="centered")
-st.title("🔭 AstroVision AI - Image Enhancer")
+# 🔐 Replace with your Replicate API Token
+REPLICATE_TOKEN = "your_replicate_token_here"
 
-st.markdown("Upload your telescope image and enhance it using AI trained on high-res space data.")
+# Upload section
+st.title("🔭 AstroVision AI")
+st.markdown("Upload a telescope image (or face) and enhance it using AI.")
 
-uploaded_file = st.file_uploader("📷 Upload Image", type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader("📷 Upload an image", type=["jpg", "jpeg", "png"])
 
-if uploaded_file is not None:
+if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
     st.image(image, caption="Original Image", use_column_width=True)
 
-    if st.button("✨ Enhance Image"):
-        with st.spinner("Enhancing image... please wait ⏳"):
-            buffered = io.BytesIO()
-            image.save(buffered, format="PNG")
-            buffered.seek(0)
+    if st.button("✨ Enhance with CodeFormer"):
+        with st.spinner("Enhancing..."):
 
-            files = {
-                'file': ('image.png', buffered, 'image/png')
-            }
+            # Upload to https://api.imgbb.com/1/upload or other image host
+            imgbb_api_key = "your_imgbb_api_key_here"
+            img_bytes = io.BytesIO()
+            image.save(img_bytes, format='PNG')
+            img_bytes.seek(0)
 
-            response = requests.post(
-                "https://akhaliq-real-esrgan.hf.space/run/predict",
-                files=files
+            upload = requests.post(
+                "https://api.imgbb.com/1/upload",
+                params={"key": imgbb_api_key},
+                files={"image": img_bytes}
             )
 
-            if response.status_code == 200:
-                result = response.json()
-                if 'data' in result and len(result['data']) > 0:
-                    enhanced_image_url = result['data'][0]
-                    enhanced_response = requests.get(enhanced_image_url)
-                    if enhanced_response.status_code == 200:
-                        enhanced_image = Image.open(io.BytesIO(enhanced_response.content))
-                        st.image(enhanced_image, caption="Enhanced Image", use_column_width=True)
+            if upload.status_code != 200:
+                st.error("Image upload failed.")
+                st.stop()
 
-                        # Download button
-                        buf = io.BytesIO()
-                        enhanced_image.save(buf, format="PNG")
-                        byte_im = buf.getvalue()
-                        b64 = base64.b64encode(byte_im).decode()
-                        href = f'<a href="data:file/png;base64,{b64}" download="enhanced.png">📥 Download Enhanced Image</a>'
-                        st.markdown(href, unsafe_allow_html=True)
-                    else:
-                        st.error("Failed to retrieve the enhanced image.")
-                else:
-                    st.error("Enhancement failed. No data returned.")
-            else:
-                st.error(f"Enhancement failed with status code {response.status_code}.")
+            image_url = upload.json()["data"]["url"]
+
+            # Set up Replicate payload
+            headers = {"Authorization": f"Token {REPLICATE_TOKEN}"}
+            payload = {
+                "version": "f9bc7a86c3cf8caa8f0fbb89e4b73463a3deca9201c70525085a05230e4e1693",
+                "input": {
+                    "image": image_url,
+                    "face_upsample": True,
+                    "codeformer_fidelity": 0.7
+                }
+            }
+
+            # Call Replicate
+            response = requests.post(
+                "https://api.replicate.com/v1/predictions",
+                headers=headers,
+                json=payload
+            )
+
+            if response.status_code != 201:
+                st.error("Replicate call failed.")
+                st.stop()
+
+            prediction_url = response.json()["urls"]["get"]
+
+            # Wait for result
+            while True:
+                result = requests.get(prediction_url, headers=headers).json()
+                if result["status"] == "succeeded":
+                    output_url = result["output"][0]
+                    break
+                elif result["status"] == "failed":
+                    st.error("Enhancement failed.")
+                    st.stop()
+                time.sleep(1)
+
+            # Show enhanced image
+            result_image = Image.open(requests.get(output_url, stream=True).raw)
+            st.image(result_image, caption="Enhanced Image", use_column_width=True)
+
+            # Add download button
+            buf = io.BytesIO()
+            result_image.save(buf, format="PNG")
+            byte_img = buf.getvalue()
+            b64 = base64.b64encode(byte_img).decode()
+            href = f'<a href="data:file/png;base64,{b64}" download="enhanced.png">📥 Download Enhanced Image</a>'
+            st.markdown(href, unsafe_allow_html=True)
