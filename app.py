@@ -45,7 +45,11 @@ try:
 
                     image_url = upload.json()["data"]["url"]
 
-                    headers = {"Authorization": f"Token {REPLICATE_TOKEN}"}
+                    headers = {
+                        "Authorization": f"Token {REPLICATE_TOKEN}",
+                        "Content-Type": "application/json"
+                    }
+
                     payload = {
                         "version": "f9bc7a86c3cf8caa8f0fbb89e4b73463a3deca9201c70525085a05230e4e1693",
                         "input": {
@@ -71,10 +75,10 @@ try:
 
                     while True:
                         result = requests.get(prediction_url, headers=headers).json()
-                        if result["status"] == "succeeded":
+                        if result.get("status") == "succeeded":
                             output_url = result["output"][0]
                             break
-                        elif result["status"] == "failed":
+                        elif result.get("status") == "failed":
                             st.error("Enhancement failed.")
                             st.stop()
                         time.sleep(1)
@@ -96,4 +100,5 @@ try:
 except ModuleNotFoundError as e:
     print("This script requires Streamlit. Please make sure you're running this in a Streamlit environment.")
     print("Error:", e)
+
 
