@@ -4,9 +4,9 @@ from PIL import Image
 import io
 import base64
 
-# ✅ Hugging Face API Token is set
+# ✅ Your Hugging Face Token is inserted
 API_TOKEN = "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"
-API_URL = "https://api-inference.huggingface.co/models/CompVis/ldm-super-resolution-4x-openimages"
+API_URL = "https://api-inference.huggingface.co/models/akhaliq/Real-ESRGAN"
 headers = {"Authorization": f"Bearer {API_TOKEN}"}
 
 st.set_page_config(page_title="AstroVision AI", layout="centered")
@@ -28,6 +28,7 @@ if uploaded_file is not None:
 
             try:
                 response = requests.post(API_URL, headers=headers, data=image_bytes)
+
                 if response.status_code == 200:
                     enhanced_image = Image.open(io.BytesIO(response.content))
                     st.image(enhanced_image, caption="Enhanced Image", use_column_width=True)
@@ -43,7 +44,7 @@ if uploaded_file is not None:
                     st.error("❌ Enhancement failed. Try again later.")
                     st.text(f"Status Code: {response.status_code}")
                     st.text(response.text)
+
             except Exception as e:
                 st.error("🚨 An error occurred during enhancement.")
                 st.text(str(e))
-
