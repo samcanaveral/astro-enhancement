@@ -54,14 +54,15 @@ try:
                         "Content-Type": "application/json"
                     }
 
-                    payload = {
-                        "version": "f9bc7a86c3cf8caa8f0fbb89e4b73463a3deca9201c70525085a05230e4e1693",
-                        "input": {
-                            "image": image_url,
-                            "face_upsample": True,
-                            "codeformer_fidelity": 0.7
-                        }
-                    }
+                    # ✅ Correct working version for CodeFormer model
+                   payload = {
+                  "version": "cc4956dd26fa5a7185d5660cc9100fab1b8070a1d1654a8bb5eb6d443b020bb2",
+                  "input": {
+                  "image": image_url,
+                  "face_upsample": True,
+                  "codeformer_fidelity": 0.7
+    }
+}
 
                     response = requests.post(
                         "https://api.replicate.com/v1/predictions",
@@ -109,6 +110,3 @@ try:
 except ModuleNotFoundError as e:
     print("This script requires Streamlit. Please make sure you're running this in a Streamlit environment.")
     print("Error:", e)
-
-
-
