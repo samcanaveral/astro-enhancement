@@ -14,13 +14,21 @@ if uploaded_file:
     st.write("✨ Enhancing your image with Hugging Face AI...")
 
     # Send image to Hugging Face model (example: Real-ESRGAN)
+       import base64
+
     api_url = "https://akhaliq-real-esrgan.hf.space/run/predict"
 
-    files = {
-        "data": (uploaded_file.name, uploaded_file, uploaded_file.type)
-    }
+    files = {"data": uploaded_file.read()}
+    response = requests.post(api_url, files={"data": ("image.png", files["data"], "image/png")})
 
-    response = requests.post(api_url, files=files)
+    if response.ok:
+        result = response.json()
+        # The model returns a base64-encoded image
+        enhanced_base64 = result["data"][0].split(",")[-1]
+        enhanced_image = Image.open(BytesIO(base64.b64decode(enhanced_base64)))
+        st.image(enhanced_image, caption="Enhanced Image", use_column_width=True)
+    else:
+        st.error("❌ Enhancement failed. Try again with a different image or check the model status.")
 
     if response.ok:
         result = response.json()
