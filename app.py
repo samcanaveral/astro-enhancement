@@ -23,7 +23,7 @@ if uploaded_file:
         with st.spinner("Enhancing..."):
 
             # Upload to https://api.imgbb.com/1/upload or other image host
-            imgbb_api_key = "0851f77a6130985f037b0c3e4afceeb5"
+            imgbb_api_key = "f9734726b159b2d73e1645577197e948"
 
             img_bytes = io.BytesIO()
             image.save(img_bytes, format='PNG')
