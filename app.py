@@ -1,55 +1,52 @@
 import streamlit as st
 import requests
 from PIL import Image
+import io
 import base64
-from io import BytesIO
 
-st.set_page_config(page_title="AstroVision AI", layout="centered")
-st.title("🔭 AstroVision AI: Telescope Image Enhancer")
+# --- Constants ---
+API_URL = "https://api-inference.huggingface.co/models/CompVis/ldm-super-resolution-4x-openimages"  # example model
+headers = {"Authorization": f"Bearer YOUR_HUGGINGFACE_TOKEN"}  # replace with your token
 
-# Upload image
-uploaded_file = st.file_uploader("Upload your telescope image (JPG or PNG)", type=["jpg", "jpeg", "png"])
+st.title("🔭 AstroVision AI - Image Enhancer")
 
-if uploaded_file:
-    # Show uploaded image
-    st.image(uploaded_file, caption="🔍 Original Image", use_column_width=True)
+# --- Upload Section ---
+uploaded_file = st.file_uploader("Upload a telescope image", type=["jpg", "png", "jpeg"])
 
-    # Read image
+if uploaded_file is not None:
     image = Image.open(uploaded_file)
-    buffered = BytesIO()
-    image.save(buffered, format="JPEG")
-    image_bytes = buffered.getvalue()
+    st.image(image, caption="Original Image", use_column_width=True)
 
-    # Prepare request to Hugging Face Space
-    api_url = "https://akhaliq-Real-ESRGAN.hf.space/run/predict"
-    files = {"data": ("image.jpg", image_bytes, "image/jpeg")}
+    if st.button("✨ Enhance Image"):
+        with st.spinner("Enhancing with Hugging Face AI..."):
 
-    with st.spinner("🚀 Enhancing your image..."):
-        try:
-            response = requests.post(api_url, files=files)
-            result = response.json()
+            image_bytes = uploaded_file.read()
+            response = requests.post(API_URL, headers=headers, data=image_bytes)
 
-            # Decode base64 image
-            enhanced_base64 = result["data"][0].split(",")[-1]
-            enhanced_bytes = base64.b64decode(enhanced_base64)
-            enhanced_image = Image.open(BytesIO(enhanced_bytes))
+            try:
+                # Try to decode image from response
+                if response.status_code == 200 and response.headers["content-type"].startswith("image/"):
+                    enhanced_image = Image.open(io.BytesIO(response.content))
+                    st.image(enhanced_image, caption="Enhanced Image", use_column_width=True)
 
-            st.success("✅ Enhancement complete!")
-            st.image(enhanced_image, caption="✨ Enhanced Image", use_column_width=True)
+                    # Download button
+                    buffered = io.BytesIO()
+                    enhanced_image.save(buffered, format="PNG")
+                    b64 = base64.b64encode(buffered.getvalue()).decode()
+                    href = f'<a href="data:file/png;base64,{b64}" download="enhanced.png">📥 Download Enhanced Image</a>'
+                    st.markdown(href, unsafe_allow_html=True)
 
-            # Download button
-            buffered = BytesIO()
-            enhanced_image.save(buffered, format="JPEG")
-            st.download_button("⬇️ Download Enhanced Image", data=buffered.getvalue(), file_name="enhanced_image.jpg", mime="image/jpeg")
+                    # Simulated object detection output
+                    st.subheader("🔎 Detected Objects (Simulated)")
+                    st.write("🪐 Example: 'Galaxy core', 'Gas cloud', 'Crater ring'")
 
-            # Placeholder for object detection
-            st.subheader("🔎 Object Detection (Coming Soon)")
-            st.info("We'll identify stars, planets, and galaxies in your image in the next release!")
+                else:
+                    st.error("❌ Enhancement failed. The model may be sleeping or returned an invalid response.")
+                    st.text(f"Status code: {response.status_code}")
+                    st.text(response.text)
 
-        except Exception as e:
-            st.error("⚠️ Enhancement failed. Check the image or model status.")
-            st.exception(e)
-else:
-    st.write("⬆️ Upload an image to get started.")
+            except Exception as e:
+                st.error("🚨 Something went wrong while enhancing the image!")
+                st.text(str(e))
 
-
+     
