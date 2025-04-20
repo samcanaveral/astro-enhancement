@@ -6,7 +6,8 @@ import base64
 import time
 
 # 🔐 Replace with your Replicate API Token
-REPLICATE_TOKEN = "your_replicate_token_here"
+REPLICATE_TOKEN = "r8_XTelSOe16FTpiFXMGo9fMEfp9cmjXWe2KJBt0"
+
 
 # Upload section
 st.title("🔭 AstroVision AI")
@@ -22,7 +23,8 @@ if uploaded_file:
         with st.spinner("Enhancing..."):
 
             # Upload to https://api.imgbb.com/1/upload or other image host
-            imgbb_api_key = "your_imgbb_api_key_here"
+            imgbb_api_key = "0851f77a6130985f037b0c3e4afceeb5"
+
             img_bytes = io.BytesIO()
             image.save(img_bytes, format='PNG')
             img_bytes.seek(0)
