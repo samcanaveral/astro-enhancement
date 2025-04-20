@@ -55,14 +55,14 @@ try:
                     }
 
                     # ✅ Correct working version for CodeFormer model
-                   payload = {
-                  "version": "cc4956dd26fa5a7185d5660cc9100fab1b8070a1d1654a8bb5eb6d443b020bb2",
-                  "input": {
-                  "image": image_url,
-                  "face_upsample": True,
-                  "codeformer_fidelity": 0.7
-    }
-}
+                    payload = {
+                        "version": "cc4956dd26fa5a7185d5660cc9100fab1b8070a1d1654a8bb5eb6d443b020bb2",
+                        "input": {
+                            "image": image_url,
+                            "face_upsample": True,
+                            "codeformer_fidelity": 0.7
+                        }
+                    }
 
                     response = requests.post(
                         "https://api.replicate.com/v1/predictions",
