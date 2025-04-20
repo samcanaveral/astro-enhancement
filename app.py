@@ -14,7 +14,7 @@ if uploaded_file:
     st.write("✨ Enhancing your image with Hugging Face AI...")
 
     # Send image to Hugging Face model (example: Real-ESRGAN)
-       import base64
+    import base64
 
     api_url = "https://akhaliq-real-esrgan.hf.space/run/predict"
 
