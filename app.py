@@ -28,7 +28,12 @@ try:
         image = Image.open(uploaded_file).convert("RGB")
         st.image(image, caption="Original Image", use_column_width=True)
 
-        if st.button("✨ Enhance Image"):
+        enhance_button = st.button("✨ Enhance Image")
+        detect_button = st.button("🔎 Detect Objects")
+
+        if enhance_button:
+            st.session_state.enhanced_url = None  # Reset any prior result
+
             with st.spinner("Enhancing..."):
                 try:
                     img_bytes = io.BytesIO()
@@ -70,11 +75,6 @@ try:
                         json=payload
                     )
 
-                    if response.status_code == 401:
-                        st.error("Unauthorized. Invalid Replicate token.")
-                        st.write("Response:", response.text)
-                        st.stop()
-
                     if response.status_code != 201:
                         st.error("Replicate call failed.")
                         st.write("Status Code:", response.status_code)
@@ -88,6 +88,7 @@ try:
                         result = requests.get(prediction_url, headers=headers).json()
                         if result.get("status") == "succeeded":
                             output_url = result["output"][0] if isinstance(result["output"], list) else result["output"]
+                            st.session_state.enhanced_url = output_url
                             break
                         elif result.get("status") == "failed":
                             st.error("Enhancement failed.")
@@ -101,60 +102,70 @@ try:
                     result_image.save(buf, format="PNG")
                     byte_img = buf.getvalue()
                     b64 = base64.b64encode(byte_img).decode()
-                    href = f'<a href="data:file/png;base64,{b64}" download="enhanced.png">👅 Download Enhanced Image</a>'
+                    href = f'<a href="data:file/png;base64,{b64}" download="enhanced.png">📥 Download Enhanced Image</a>'
                     st.markdown(href, unsafe_allow_html=True)
 
-                    # ⭐️ Detect Objects with YOLOv8 - keremberke/yolov8n-astronomy
-                    if st.button("🔎 Detect Objects"):
-                        st.info("Running object detection on enhanced image...")
+                except Exception as e:
+                    st.error("Unexpected error occurred during enhancement.")
+                    st.write("Error details:", str(e))
 
-                        detect_payload = {
-                            "version": "a00c77891e583c9166c9387a9e3c10b658b80f6743896e0edc99d8db4411fd1c",
-                            "input": {
-                                "image": output_url,
-                                "conf": 0.4,
-                                "iou": 0.5
-                            }
+        if detect_button:
+            if "enhanced_url" not in st.session_state or not st.session_state.enhanced_url:
+                st.warning("Please enhance an image first.")
+            else:
+                st.info("Running object detection on enhanced image...")
+
+                try:
+                    headers = {
+                        "Authorization": f"Token {REPLICATE_TOKEN}",
+                        "Content-Type": "application/json"
+                    }
+
+                    detect_payload = {
+                        "version": "a00c77891e583c9166c9387a9e3c10b658b80f6743896e0edc99d8db4411fd1c",
+                        "input": {
+                            "image": st.session_state.enhanced_url,
+                            "conf": 0.4,
+                            "iou": 0.5
                         }
+                    }
 
-                        detect_response = requests.post(
-                            "https://api.replicate.com/v1/predictions",
-                            headers=headers,
-                            json=detect_payload
-                        )
+                    detect_response = requests.post(
+                        "https://api.replicate.com/v1/predictions",
+                        headers=headers,
+                        json=detect_payload
+                    )
 
-                        if detect_response.status_code != 201:
-                            st.error("Object detection call failed.")
-                            st.write("Status Code:", detect_response.status_code)
-                            st.write("Response:", detect_response.text)
+                    if detect_response.status_code != 201:
+                        st.error("Object detection call failed.")
+                        st.write("Status Code:", detect_response.status_code)
+                        st.write("Response:", detect_response.text)
+                        st.stop()
+
+                    detect_url = detect_response.json()["urls"]["get"]
+
+                    while True:
+                        detect_result = requests.get(detect_url, headers=headers).json()
+                        if detect_result.get("status") == "succeeded":
+                            detect_output = detect_result["output"]
+                            break
+                        elif detect_result.get("status") == "failed":
+                            st.error("Detection failed.")
                             st.stop()
+                        time.sleep(1)
 
-                        detect_url = detect_response.json()["urls"]["get"]
-
-                        while True:
-                            detect_result = requests.get(detect_url, headers=headers).json()
-                            if detect_result.get("status") == "succeeded":
-                                detect_output = detect_result["output"]
-                                break
-                            elif detect_result.get("status") == "failed":
-                                st.error("Detection failed.")
-                                st.stop()
-                            time.sleep(1)
-
-                        if detect_output:
-                            st.image(detect_output, caption="Detected Celestial Objects", use_column_width=True)
-                        else:
-                            st.warning("No objects detected or no visual result returned.")
+                    if detect_output:
+                        st.image(detect_output, caption="Detected Celestial Objects", use_column_width=True)
+                    else:
+                        st.warning("No objects detected or no visual result returned.")
 
                 except Exception as e:
-                    st.error("Unexpected error occurred.")
+                    st.error("Unexpected error occurred during detection.")
                     st.write("Error details:", str(e))
 
 except Exception as e:
     print("This script requires Streamlit. Please make sure you're running this in a Streamlit environment.")
     print("Error:", e)
-
-
 
 
 
