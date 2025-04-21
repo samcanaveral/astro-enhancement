@@ -1,5 +1,4 @@
-# AstroVision AI Enhancement App
-# Note: This script requires Streamlit and should be run in a Streamlit-compatible environment
+
 
 try:
     import streamlit as st
@@ -11,9 +10,14 @@ try:
 
     # 🔐 Replace with your Replicate API Token
     REPLICATE_TOKEN = st.secrets["REPLICATE_TOKEN"] if "REPLICATE_TOKEN" in st.secrets else ""
+    IMGBB_KEY = st.secrets["IMGBB_KEY"] if "IMGBB_KEY" in st.secrets else ""
 
     if not REPLICATE_TOKEN:
         st.error("Replicate API token not found. Please set it in Streamlit secrets.")
+        st.stop()
+
+    if not IMGBB_KEY:
+        st.error("ImgBB API key not found. Please set it in Streamlit secrets.")
         st.stop()
 
     # Upload section
@@ -29,15 +33,13 @@ try:
         if st.button("✨ Enhance with CodeFormer"):
             with st.spinner("Enhancing..."):
                 try:
-                    imgbb_api_key = "f9734726b159b2d73e1645577197e948"
-
                     img_bytes = io.BytesIO()
                     image.save(img_bytes, format='PNG')
                     img_bytes.seek(0)
 
                     upload = requests.post(
                         "https://api.imgbb.com/1/upload",
-                        params={"key": imgbb_api_key},
+                        params={"key": IMGBB_KEY},
                         files={"image": img_bytes}
                     )
 
@@ -54,9 +56,9 @@ try:
                         "Content-Type": "application/json"
                     }
 
-                    # ✅ Correct working version for CodeFormer model (replace with valid version ID)
+                    # ✅ Updated with working model version ID from Replicate CodeFormer API
                     payload = {
-                        "version": "0c6c913f-fd44-4c9b-9393-76f176f9305d",
+                        "version": "cbf5c20c3c927c93be125e35f1c3fb6db8d8b75c16f383aa7fcbe10716e4d2e3",
                         "input": {
                             "image": image_url,
                             "face_upsample": True,
@@ -110,4 +112,5 @@ try:
 except Exception as e:
     print("This script requires Streamlit. Please make sure you're running this in a Streamlit environment.")
     print("Error:", e)
+
 
