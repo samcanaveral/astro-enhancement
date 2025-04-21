@@ -122,11 +122,11 @@ try:
                     }
 
                     detect_payload = {
-                        "version": "c742fcf1ce43828a5fbf9d3d24f4516fbb09e67974f9d7df09c5a2788320ff1e",
+                        "version": "dbb6f9b77f146e3f16f47860e2afdaee3f9cfb4f6b1c0c7f802b62b5c0f6e1ab",
                         "input": {
                             "image": st.session_state.enhanced_url,
-                            "conf": 0.4,
-                            "iou": 0.5
+                            "conf_threshold": 0.25,
+                            "iou_threshold": 0.45
                         }
                     }
 
@@ -167,6 +167,7 @@ try:
 except Exception as e:
     print("This script requires Streamlit. Please make sure you're running this in a Streamlit environment.")
     print("Error:", e)
+
 
 
 
