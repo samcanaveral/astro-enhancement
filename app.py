@@ -122,7 +122,7 @@ try:
                     }
 
                     detect_payload = {
-                        "version": "fcb20f0e99e98511fc53d2e6f77d8fd97d8eb35c0ad2964f314a0b605d6c0c85",
+                        "version": "c742fcf1ce43828a5fbf9d3d24f4516fbb09e67974f9d7df09c5a2788320ff1e",
                         "input": {
                             "image": st.session_state.enhanced_url,
                             "conf": 0.4,
