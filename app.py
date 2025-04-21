@@ -54,7 +54,7 @@ try:
                         "Content-Type": "application/json"
                     }
 
-                    # ✅ Updated Real-ESRGAN model from Replicate
+                    # ✅ Enhancement using Real-ESRGAN
                     payload = {
                         "version": "f121d640bd286e1fdc67f9799164c1d5be36ff74576ee11c803ae5b665dd46aa",
                         "input": {
@@ -104,6 +104,48 @@ try:
                     href = f'<a href="data:file/png;base64,{b64}" download="enhanced.png">📥 Download Enhanced Image</a>'
                     st.markdown(href, unsafe_allow_html=True)
 
+                    # ⭐️ Detect Objects with YOLOv8
+                    if st.button("🔎 Detect Objects"):
+                        st.info("Running object detection on enhanced image...")
+
+                        detect_payload = {
+                            "version": "d23ef71c81b2e7f8fc1f42f04b56f5fbc694e3f54877dcf2f111750b5dbaa54d",
+                            "input": {
+                                "image": output_url,
+                                "confidence": 0.4,
+                                "iou": 0.5
+                            }
+                        }
+
+                        detect_response = requests.post(
+                            "https://api.replicate.com/v1/predictions",
+                            headers=headers,
+                            json=detect_payload
+                        )
+
+                        if detect_response.status_code != 201:
+                            st.error("Object detection call failed.")
+                            st.write("Status Code:", detect_response.status_code)
+                            st.write("Response:", detect_response.text)
+                            st.stop()
+
+                        detect_url = detect_response.json()["urls"]["get"]
+
+                        while True:
+                            detect_result = requests.get(detect_url, headers=headers).json()
+                            if detect_result.get("status") == "succeeded":
+                                detect_output = detect_result["output"]
+                                break
+                            elif detect_result.get("status") == "failed":
+                                st.error("Detection failed.")
+                                st.stop()
+                            time.sleep(1)
+
+                        if detect_output:
+                            st.image(detect_output, caption="Detected Objects", use_column_width=True)
+                        else:
+                            st.warning("No objects detected or no visual result returned.")
+
                 except Exception as e:
                     st.error("Unexpected error occurred.")
                     st.write("Error details:", str(e))
@@ -111,6 +153,7 @@ try:
 except Exception as e:
     print("This script requires Streamlit. Please make sure you're running this in a Streamlit environment.")
     print("Error:", e)
+
 
 
 
