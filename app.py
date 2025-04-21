@@ -87,8 +87,13 @@ try:
                         result = requests.get(prediction_url, headers=headers).json()
                         if result.get("status") == "succeeded":
                             output_url = result["output"][0]
-                            break
-                        elif result.get("status") == "failed":
+
+                    if not output_url.startswith("http"):
+                    st.error(f"Invalid output URL received: {output_url}")
+                    st.stop()
+
+                    result_image = Image.open(requests.get(output_url, stream=True).raw)
+
                             st.error("Enhancement failed.")
                             st.stop()
                         time.sleep(1)
