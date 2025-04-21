@@ -54,7 +54,6 @@ try:
                         "Content-Type": "application/json"
                     }
 
-                    # ✅ Correct working version for CodeFormer model
                     payload = {
                         "version": "cc4956dd26fa5a7185d5660cc9100fab1b8070a1d1654a8bb5eb6d443b020bb2",
                         "input": {
@@ -88,24 +87,24 @@ try:
                         if result.get("status") == "succeeded":
                             output_url = result["output"][0]
 
-                    if not output_url.startswith("http"):
-                    st.error(f"Invalid output URL received: {output_url}")
-                    st.stop()
+                            if not output_url.startswith("http"):
+                                st.error(f"Invalid output URL received: {output_url}")
+                                st.stop()
 
-                    result_image = Image.open(requests.get(output_url, stream=True).raw)
-
+                            result_image = Image.open(requests.get(output_url, stream=True).raw)
+                            break
+                        elif result.get("status") == "failed":
                             st.error("Enhancement failed.")
                             st.stop()
                         time.sleep(1)
 
-                    result_image = Image.open(requests.get(output_url, stream=True).raw)
                     st.image(result_image, caption="Enhanced Image", use_column_width=True)
 
                     buf = io.BytesIO()
                     result_image.save(buf, format="PNG")
                     byte_img = buf.getvalue()
                     b64 = base64.b64encode(byte_img).decode()
-                    href = f'<a href="data:file/png;base64,{b64}" download="enhanced.png">📥 Download Enhanced Image</a>'
+                    href = f'<a href="data:file/png;base64,{b64}" download="enhanced.png">📅 Download Enhanced Image</a>'
                     st.markdown(href, unsafe_allow_html=True)
 
                 except Exception as e:
