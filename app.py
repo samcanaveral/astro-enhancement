@@ -54,12 +54,13 @@ try:
                         "Content-Type": "application/json"
                     }
 
-                    # ✅ Using a working version ID from a different model (stability-ai/sdxl) for general image enhancement
+                    # ✅ Using a different valid version ID from a working CodeFormer model
                     payload = {
-                        "version": "cde69fdcf8e054dd1df7e7d9d1b858141198df7f4b2e3fdfc269d376c80f89fc",
+                        "version": "f9bc7a86c3cf8caa8f0fbb89e4b73463a3deca9201c70525085a05230e4e1693",
                         "input": {
-                            "prompt": "high quality enhanced photo of deep space telescope capture",
-                            "image": image_url
+                            "image": image_url,
+                            "face_upsample": True,
+                            "codeformer_fidelity": 0.7
                         }
                     }
 
@@ -86,7 +87,7 @@ try:
                     while True:
                         result = requests.get(prediction_url, headers=headers).json()
                         if result.get("status") == "succeeded":
-                            output_url = result["output"]
+                            output_url = result["output"][0] if isinstance(result["output"], list) else result["output"]
                             break
                         elif result.get("status") == "failed":
                             st.error("Enhancement failed.")
@@ -110,5 +111,6 @@ try:
 except Exception as e:
     print("This script requires Streamlit. Please make sure you're running this in a Streamlit environment.")
     print("Error:", e)
+
 
 
