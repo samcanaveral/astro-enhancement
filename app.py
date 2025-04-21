@@ -122,7 +122,7 @@ try:
                     }
 
                     detect_payload = {
-                        "version": "a00c77891e583c9166c9387a9e3c10b658b80f6743896e0edc99d8db4411fd1c",
+                        "version": "fcb20f0e99e98511fc53d2e6f77d8fd97d8eb35c0ad2964f314a0b605d6c0c85",
                         "input": {
                             "image": st.session_state.enhanced_url,
                             "conf": 0.4,
@@ -139,6 +139,7 @@ try:
                     if detect_response.status_code != 201:
                         st.error("Object detection call failed.")
                         st.write("Status Code:", detect_response.status_code)
+                        st.write("Payload:", detect_payload)
                         st.write("Response:", detect_response.text)
                         st.stop()
 
@@ -166,7 +167,6 @@ try:
 except Exception as e:
     print("This script requires Streamlit. Please make sure you're running this in a Streamlit environment.")
     print("Error:", e)
-
 
 
 
