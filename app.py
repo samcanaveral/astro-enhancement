@@ -29,7 +29,7 @@ try:
         if st.button("✨ Enhance with CodeFormer"):
             with st.spinner("Enhancing..."):
                 try:
-                    imgbb_api_key = "f9734726b159b2d73e1645577197e948"
+                    imgbb_api_key = st.secrets.get("IMGBB_API_KEY", "your_default_api_key")  # Use Streamlit secrets for API key
 
                     img_bytes = io.BytesIO()
                     image.save(img_bytes, format='PNG')
