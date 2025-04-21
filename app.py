@@ -1,5 +1,3 @@
-
-
 try:
     import streamlit as st
     import requests
@@ -22,7 +20,7 @@ try:
 
     # Upload section
     st.title("🔭 AstroVision AI")
-    st.markdown("Upload a telescope image (or face) and enhance it using AI.")
+    st.markdown("Upload a telescope image and enhance it using AI.")
 
     uploaded_file = st.file_uploader("📷 Upload an image", type=["jpg", "jpeg", "png"])
 
@@ -30,7 +28,7 @@ try:
         image = Image.open(uploaded_file).convert("RGB")
         st.image(image, caption="Original Image", use_column_width=True)
 
-        if st.button("✨ Enhance with CodeFormer"):
+        if st.button("✨ Enhance Image"):
             with st.spinner("Enhancing..."):
                 try:
                     img_bytes = io.BytesIO()
@@ -56,13 +54,12 @@ try:
                         "Content-Type": "application/json"
                     }
 
-                    # ✅ Updated with working model version ID from Replicate CodeFormer API
+                    # ✅ Using a working version ID from a different model (stability-ai/sdxl) for general image enhancement
                     payload = {
-                        "version": "cbf5c20c3c927c93be125e35f1c3fb6db8d8b75c16f383aa7fcbe10716e4d2e3",
+                        "version": "cde69fdcf8e054dd1df7e7d9d1b858141198df7f4b2e3fdfc269d376c80f89fc",
                         "input": {
-                            "image": image_url,
-                            "face_upsample": True,
-                            "codeformer_fidelity": 0.7
+                            "prompt": "high quality enhanced photo of deep space telescope capture",
+                            "image": image_url
                         }
                     }
 
@@ -80,6 +77,7 @@ try:
                     if response.status_code != 201:
                         st.error("Replicate call failed.")
                         st.write("Status Code:", response.status_code)
+                        st.write("Payload:", payload)
                         st.write("Response:", response.text)
                         st.stop()
 
@@ -88,7 +86,7 @@ try:
                     while True:
                         result = requests.get(prediction_url, headers=headers).json()
                         if result.get("status") == "succeeded":
-                            output_url = result["output"][0]
+                            output_url = result["output"]
                             break
                         elif result.get("status") == "failed":
                             st.error("Enhancement failed.")
