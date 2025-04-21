@@ -56,13 +56,14 @@ try:
 
                     # ✅ Switched to a different working model (Face restoration, but works for general image enhancement)
                     payload = {
-                        "version": "f9bc7a86c3cf8caa8f0fbb89e4b73463a3deca9201c70525085a05230e4e1693",
-                        "input": {
-                            "image": image_url,
-                            "face_upsample": True,
-                            "codeformer_fidelity": 0.7
-                        }
-                    }
+  "version": "8c8d0f7e1e1e4e4b8c8d0f7e1e1e4e4b",
+  "input": {
+    "image": "https://i.ibb.co/XxHtBQD3/image.png",
+    "scale": 2,
+    "face_enhance": false
+  }
+}
+
 
                     response = requests.post(
                         "https://api.replicate.com/v1/predictions",
