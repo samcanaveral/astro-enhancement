@@ -47,7 +47,7 @@ try:
                         st.write("Response:", upload.text)
                         st.stop()
 
-                    image_url = upload.json()["data"].get("url", "")
+                    image_url = upload.json().get("data", {}).get("url", "")
 
                     if not image_url.startswith("http"):
                         st.error(f"Invalid image URL received: {image_url}")
@@ -84,32 +84,44 @@ try:
                         st.write("Response:", response.text)
                         st.stop()
 
-                    prediction_url = response.json()["urls"]["get"]
+                    prediction_url = response.json().get("urls", {}).get("get", "")
+
+                    if not prediction_url.startswith("http"):
+                        st.error(f"Invalid prediction URL received: {prediction_url}")
+                        st.stop()
+
+                    result_image = None
 
                     while True:
-                        result = requests.get(prediction_url, headers=headers).json()
+                        poll_response = requests.get(prediction_url, headers=headers)
+                        result = poll_response.json()
+
                         if result.get("status") == "succeeded":
-                            output_url = result.get("output", [""])[0]
-
-                            if not output_url.startswith("http"):
-                                st.error(f"Invalid output URL received: {output_url}")
+                            outputs = result.get("output", [])
+                            if outputs and isinstance(outputs, list):
+                                output_url = outputs[0]
+                                if not isinstance(output_url, str) or not output_url.startswith("http"):
+                                    st.error(f"Invalid output URL received: {output_url}")
+                                    st.stop()
+                                result_image = Image.open(requests.get(output_url, stream=True).raw)
+                                break
+                            else:
+                                st.error("No valid output URL returned.")
                                 st.stop()
-
-                            result_image = Image.open(requests.get(output_url, stream=True).raw)
-                            break
                         elif result.get("status") == "failed":
                             st.error("Enhancement failed.")
                             st.stop()
                         time.sleep(1)
 
-                    st.image(result_image, caption="Enhanced Image", use_column_width=True)
+                    if result_image:
+                        st.image(result_image, caption="Enhanced Image", use_column_width=True)
 
-                    buf = io.BytesIO()
-                    result_image.save(buf, format="PNG")
-                    byte_img = buf.getvalue()
-                    b64 = base64.b64encode(byte_img).decode()
-                    href = f'<a href="data:file/png;base64,{b64}" download="enhanced.png">📅 Download Enhanced Image</a>'
-                    st.markdown(href, unsafe_allow_html=True)
+                        buf = io.BytesIO()
+                        result_image.save(buf, format="PNG")
+                        byte_img = buf.getvalue()
+                        b64 = base64.b64encode(byte_img).decode()
+                        href = f'<a href="data:file/png;base64,{b64}" download="enhanced.png">📥 Download Enhanced Image</a>'
+                        st.markdown(href, unsafe_allow_html=True)
 
                 except Exception as e:
                     st.error("Unexpected error occurred.")
