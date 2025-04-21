@@ -19,7 +19,7 @@ try:
         st.stop()
 
     # Upload section
-    st.title("🔭 AstroVision AI")
+    st.title("🌠 AstroVision AI")
     st.markdown("Upload a telescope image and enhance it using AI.")
 
     uploaded_file = st.file_uploader("📷 Upload an image", type=["jpg", "jpeg", "png"])
@@ -54,16 +54,15 @@ try:
                         "Content-Type": "application/json"
                     }
 
-                    # ✅ Switched to a different working model (Face restoration, but works for general image enhancement)
+                    # ✅ Updated Real-ESRGAN model from Replicate
                     payload = {
-  "version": "8c8d0f7e1e1e4e4b8c8d0f7e1e1e4e4b",
-  "input": {
-    "image": "https://i.ibb.co/XxHtBQD3/image.png",
-    "scale": 2,
-    "face_enhance": false
-  }
-}
-
+                        "version": "f121d640bd286e1fdc67f9799164c1d5be36ff74576ee11c803ae5b665dd46aa",
+                        "input": {
+                            "image": image_url,
+                            "scale": 2,
+                            "face_enhance": False
+                        }
+                    }
 
                     response = requests.post(
                         "https://api.replicate.com/v1/predictions",
@@ -112,6 +111,7 @@ try:
 except Exception as e:
     print("This script requires Streamlit. Please make sure you're running this in a Streamlit environment.")
     print("Error:", e)
+
 
 
 
