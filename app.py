@@ -47,7 +47,11 @@ try:
                         st.write("Response:", upload.text)
                         st.stop()
 
-                    image_url = upload.json()["data"]["url"]
+                    image_url = upload.json()["data"].get("url", "")
+
+                    if not image_url.startswith("http"):
+                        st.error(f"Invalid image URL received: {image_url}")
+                        st.stop()
 
                     headers = {
                         "Authorization": f"Token {REPLICATE_TOKEN}",
@@ -85,7 +89,7 @@ try:
                     while True:
                         result = requests.get(prediction_url, headers=headers).json()
                         if result.get("status") == "succeeded":
-                            output_url = result["output"][0]
+                            output_url = result.get("output", [""])[0]
 
                             if not output_url.startswith("http"):
                                 st.error(f"Invalid output URL received: {output_url}")
