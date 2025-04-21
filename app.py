@@ -10,7 +10,7 @@ try:
     import time
 
     # 🔐 Replace with your Replicate API Token
-    REPLICATE_TOKEN = st.secrets["REPLICATE_TOKEN"] if "REPLICATE_TOKEN" in st.secrets else ""
+    REPLICATE_TOKEN = st.secrets.get("REPLICATE_TOKEN", "")
 
     if not REPLICATE_TOKEN:
         st.error("Replicate API token not found. Please set it in Streamlit secrets.")
@@ -128,5 +128,5 @@ try:
                     st.write("Error details:", str(e))
 
 except ModuleNotFoundError as e:
-    print("This script requires Streamlit. Please make sure you're running this in a Streamlit environment.")
-    print("Error:", e)
+    st.error("This script requires Streamlit. Please make sure you're running this in a Streamlit environment.")
+    st.write("Error:", str(e))
