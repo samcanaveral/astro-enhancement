@@ -54,7 +54,7 @@ try:
                         "Content-Type": "application/json"
                     }
 
-                    # ✅ Using a different valid version ID from a working CodeFormer model
+                    # ✅ Switched to a different working model (Face restoration, but works for general image enhancement)
                     payload = {
                         "version": "f9bc7a86c3cf8caa8f0fbb89e4b73463a3deca9201c70525085a05230e4e1693",
                         "input": {
@@ -111,6 +111,7 @@ try:
 except Exception as e:
     print("This script requires Streamlit. Please make sure you're running this in a Streamlit environment.")
     print("Error:", e)
+
 
 
 
