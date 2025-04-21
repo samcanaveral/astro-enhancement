@@ -101,18 +101,18 @@ try:
                     result_image.save(buf, format="PNG")
                     byte_img = buf.getvalue()
                     b64 = base64.b64encode(byte_img).decode()
-                    href = f'<a href="data:file/png;base64,{b64}" download="enhanced.png">📥 Download Enhanced Image</a>'
+                    href = f'<a href="data:file/png;base64,{b64}" download="enhanced.png">👅 Download Enhanced Image</a>'
                     st.markdown(href, unsafe_allow_html=True)
 
-                    # ⭐️ Detect Objects with YOLOv8
+                    # ⭐️ Detect Objects with YOLOv8 - keremberke/yolov8n-astronomy
                     if st.button("🔎 Detect Objects"):
                         st.info("Running object detection on enhanced image...")
 
                         detect_payload = {
-                            "version": "d23ef71c81b2e7f8fc1f42f04b56f5fbc694e3f54877dcf2f111750b5dbaa54d",
+                            "version": "a00c77891e583c9166c9387a9e3c10b658b80f6743896e0edc99d8db4411fd1c",
                             "input": {
                                 "image": output_url,
-                                "confidence": 0.4,
+                                "conf": 0.4,
                                 "iou": 0.5
                             }
                         }
@@ -142,7 +142,7 @@ try:
                             time.sleep(1)
 
                         if detect_output:
-                            st.image(detect_output, caption="Detected Objects", use_column_width=True)
+                            st.image(detect_output, caption="Detected Celestial Objects", use_column_width=True)
                         else:
                             st.warning("No objects detected or no visual result returned.")
 
