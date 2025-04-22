@@ -121,9 +121,9 @@ try:
                         "Content-Type": "application/json"
                     }
 
-                    # ✅ Updated to use a verified working object detection model
+                    # ✅ Updated to use AI-powered celestial object detection
                     detect_payload = {
-                        "version": "c793f68c8a5dc7b8e16fc0050a008e7d6a7c47fe9d53990a6283c9cc5c0bf6c8",
+                        "version": "e2db0152b4a8609a6d08458e30779c1846f38b947a1cf63dcb0a3d180911b06e",
                         "input": {
                             "image": st.session_state.enhanced_url
                         }
@@ -155,7 +155,7 @@ try:
                         time.sleep(1)
 
                     if detect_output:
-                        st.image(detect_output, caption="Detected Objects", use_column_width=True)
+                        st.image(detect_output, caption="Detected Celestial Objects", use_column_width=True)
                     else:
                         st.warning("No objects detected or no visual result returned.")
 
