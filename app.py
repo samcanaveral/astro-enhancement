@@ -121,9 +121,9 @@ try:
                         "Content-Type": "application/json"
                     }
 
-                    # ✅ Using working general YOLOv8 detection model
+                    # ✅ Using a known working general-purpose YOLOv8 model
                     detect_payload = {
-                        "version": "b8e8625f9345fa6b408ec576c4d40b5f64d305aa4a960e42e987a49a0828bf9c",
+                        "version": "db21e45b4237c845c13c4c733f50eeab64b5ad09f705f7f74b328d939f8c1f65",
                         "input": {
                             "image": st.session_state.enhanced_url
                         }
@@ -166,3 +166,4 @@ try:
 except Exception as e:
     print("This script requires Streamlit. Please make sure you're running this in a Streamlit environment.")
     print("Error:", e)
+
