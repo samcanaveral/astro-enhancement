@@ -121,13 +121,11 @@ try:
                         "Content-Type": "application/json"
                     }
 
-                    # ✅ Working object detection model (yolov8) for general images
+                    # ✅ Using working general YOLOv8 detection model
                     detect_payload = {
-                        "version": "2f804f8cfc05dc7f8a9edb5e3cf74f1f8492f6f8b912c3887cd403b2bdbb6f65",
+                        "version": "b8e8625f9345fa6b408ec576c4d40b5f64d305aa4a960e42e987a49a0828bf9c",
                         "input": {
-                            "image": st.session_state.enhanced_url,
-                            "conf": 0.25,
-                            "iou": 0.45
+                            "image": st.session_state.enhanced_url
                         }
                     }
 
