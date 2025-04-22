@@ -102,7 +102,7 @@ try:
                     result_image.save(buf, format="PNG")
                     byte_img = buf.getvalue()
                     b64 = base64.b64encode(byte_img).decode()
-                    href = f'<a href="data:file/png;base64,{b64}" download="enhanced.png">📥 Download Enhanced Image</a>'
+                    href = f'<a href="data:file/png;base64,{b64}" download="enhanced.png">📅 Download Enhanced Image</a>'
                     st.markdown(href, unsafe_allow_html=True)
 
                 except Exception as e:
@@ -122,11 +122,10 @@ try:
                     }
 
                     detect_payload = {
-                        "version": "dbb6f9b77f146e3f16f47860e2afdaee3f9cfb4f6b1c0c7f802b62b5c0f6e1ab",
+                        "version": "fb7e5d3f31caa2aa3784b1f6d4742f90c6f15c8369ad48a343b58b2fbd5fe782",
                         "input": {
                             "image": st.session_state.enhanced_url,
-                            "conf_threshold": 0.25,
-                            "iou_threshold": 0.45
+                            "conf": 0.25
                         }
                     }
 
@@ -167,7 +166,3 @@ try:
 except Exception as e:
     print("This script requires Streamlit. Please make sure you're running this in a Streamlit environment.")
     print("Error:", e)
-
-
-
-
