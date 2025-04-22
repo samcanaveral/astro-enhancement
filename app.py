@@ -121,11 +121,13 @@ try:
                         "Content-Type": "application/json"
                     }
 
-                    # ✅ Updated to use AI-powered celestial object detection
+                    # ✅ Working object detection model (yolov8) for general images
                     detect_payload = {
-                        "version": "e2db0152b4a8609a6d08458e30779c1846f38b947a1cf63dcb0a3d180911b06e",
+                        "version": "2f804f8cfc05dc7f8a9edb5e3cf74f1f8492f6f8b912c3887cd403b2bdbb6f65",
                         "input": {
-                            "image": st.session_state.enhanced_url
+                            "image": st.session_state.enhanced_url,
+                            "conf": 0.25,
+                            "iou": 0.45
                         }
                     }
 
