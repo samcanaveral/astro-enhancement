@@ -121,11 +121,13 @@ try:
                         "Content-Type": "application/json"
                     }
 
-                    # ✅ Replace with a verified working YOLOv5 object detection model
+                    # ✅ Updated: Working YOLOv5 object detection model
                     detect_payload = {
-                        "version": "1b6df092c70d066fbfcdcccfd93787c160d40d648b2700c0c1b4dfaf7c1b4e1d",  # yolov5s model
+                        "version": "21e96256c1e4262f0f8a694ffe8b63aa0f151b36ba0baf3e8c67c6b3ed21c88b",
                         "input": {
-                            "image": st.session_state.enhanced_url
+                            "image": st.session_state.enhanced_url,
+                            "conf": 0.4,
+                            "iou": 0.45
                         }
                     }
 
